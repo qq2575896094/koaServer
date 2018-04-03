@@ -4,9 +4,9 @@
  * 配置API模块路由
  */
 
-var router = require('koa-router')();
+const router = require('koa-router')();
 
-var user_router = require('./user_router');
+const user_router = require('./user_router');
 
 router.use('/users', user_router.routes(), user_router.allowedMethods());
 

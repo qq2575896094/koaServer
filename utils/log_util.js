@@ -63,7 +63,7 @@ function formatRequestLog(request, resTime) {
     //客户端ip
     logTxt += "request client ip:  " + request.ip + "\n";
     //开始时间
-    var startTime;
+    let startTime;
     //请求参数
     if (method === 'GET') {
         logTxt += "request query:  " + JSON.stringify(request.query) + "\n";
