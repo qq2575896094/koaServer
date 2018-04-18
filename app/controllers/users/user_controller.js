@@ -8,9 +8,9 @@
  *  获取用户信息
  */
 
-const ApiErrorName = require('../error/ApiErrorName');
+const ApiErrorName = require('../../error/ApiErrorName');
 
-const ApiError = require('../error/ApiError');
+const ApiError = require('../../error/ApiError');
 
 exports.getUser = async (ctx, next) => {
     // console.log(ctx);

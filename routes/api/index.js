@@ -8,7 +8,11 @@ const router = require('koa-router')();
 
 const user_router = require('./user_router');
 
-router.use('/users', user_router.routes(), user_router.allowedMethods());
+const oauth = require('./oauth');
+
+// router.use('/users', user_router.routes(), user_router.allowedMethods());
+//
+// router.use('/oauths', oauth.routes(), oauth.allowedMethods());
 
 
 module.exports = router;
