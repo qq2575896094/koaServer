@@ -89,50 +89,31 @@ class WeChat {
     }
 
     /**
-     *
+     * 新增临时素材
      * @param type
      * @param material
-     * @param permanent
      * @returns {Promise<any>}
      */
-    async uploadMaterial(type, material, permanent) {
+    async uploadTemporaryMaterial(type, material) {
 
         let oAccessToken = await this.getAccessToken();//获取access_token
 
         let form = {};
 
+        form.media = fs.createReadStream(material);
+
         //默认是上传临时文件
         let uploadUrl = oWeChatApi.temporaryMaterialUrl + 'access_token=' + oAccessToken.access_token + '&type=' + type;
 
-        if (permanent) {
-            uploadUrl = oWeChatApi.permanentMaterial.uploadMaterial + 'access_token=' + oAccessToken.access_token + '&type=' + type;
-
-            _.extend(form, permanent);
-        }
-
-        if (type === 'newsPic') {
-            uploadUrl = oWeChatApi.permanentMaterial.uploadNewsPic + 'access_token=' + oAccessToken.access_token;
-        }
-
-        if (type === 'news') {
-            uploadUrl = oWeChatApi.permanentMaterial.uploadNews + 'access_token=' + oAccessToken.access_token;
-            form = material;
-        } else {
-            form.access_token = oAccessToken.access_token;
-            form.media = fs.createReadStream(material);
-        }
 
         return await new Promise((resolve, reject) => {
             let options = {
                 url: uploadUrl,
                 method: 'POST',
-                json: true
+                json: true,
+                formData: form
             };
-            if (type === 'news') {
-                options.body = form;
-            } else {
-                options.formData = form;
-            }
+
             console.log(options);
             request.post(options, function (error, response, body) {
                 if (error) {
@@ -140,7 +121,9 @@ class WeChat {
                 } else {
                     if (!body.errcode) {
 
-                        resolve(body.media_id);
+                        console.log(JSON.stringify(body));
+
+                        resolve(body);
                     } else {
                         console.log(body.errcode + ' ==>' + body.errmsg);
                         reject(body.errcode + ' ==>' + body.errmsg);
@@ -148,8 +131,74 @@ class WeChat {
 
                 }
             });
+        }).catch((e) => {
+            console.log(e);
         });
     }
+
+    /**
+     *
+     * @returns {Promise<any>}
+     */
+    async uploadPermanentMaterial(type, material) {
+
+        let oAccessToken = await this.getAccessToken();//获取access_token
+
+        let form = {};
+
+
+        //默认增加其他类型永久素材
+        let uploadUrl = oWeChatApi.permanentMaterial.uploadMaterial + 'access_token=' + oAccessToken.access_token + '&type=' + type;
+
+
+        if (type === 'news') {//新增永久图文素材
+            uploadUrl = oWeChatApi.permanentMaterial.uploadNews + 'access_token=' + oAccessToken.access_token;
+
+            form = material;
+        } else {
+
+            form.media = fs.createReadStream(material);
+        }
+
+        if (type === 'newsPic') {//上传图文消息内的图片获取URL
+            uploadUrl = oWeChatApi.permanentMaterial.uploadNewsPic + 'access_token=' + oAccessToken.access_token;
+        }
+
+
+        let options = {
+            url: uploadUrl,
+            method: 'POST',
+            json: true,
+
+        };
+
+        type === 'news' ? options.body = form : options.formData = form;
+
+        console.log(options);
+        return await new Promise((resolve, reject) => {
+
+            request(options, function (error, response, body) {
+                if (error) {
+                    reject(error);
+                } else {
+                    if (!body.errcode) {
+
+                        console.log(JSON.stringify(body));
+
+                        resolve(body);
+                    } else {
+                        console.log(body.errcode + ' ==>' + body.errmsg);
+                        reject(body.errcode + ' ==>' + body.errmsg);
+                    }
+
+                }
+            });
+        }).catch((e) => {
+            console.log(e);
+        });
+
+    }
+
 }
 
 module.exports = WeChat;

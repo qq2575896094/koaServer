@@ -13,4 +13,4 @@ module.exports = {
     development_env: development_env,
     test_env: test_env,
     product_env: product_env
-}[process.env.NODE_ENV || 'product_env'];
+}[process.env.NODE_ENV || 'development_env'];

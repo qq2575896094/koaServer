@@ -1,9 +1,11 @@
 const Koa = require('koa');
 const app = new Koa();
 const views = require('koa-views');
-// const json = require('koa-json');
+const json = require('koa-json');
 const onerror = require('koa-onerror');
-// const bodyParser = require('koa-bodyparser')();
+const httpProxy = require('http-proxy-middleware');
+const bodyParser = require('koa-bodyparser')({ enableTypes:['json', 'form', 'text'] });
+const k2c = require('koa2-connect');
 
 const logger = require('koa-logger');
 const logUtil = require('./utils/log_util');
@@ -13,13 +15,29 @@ const router = require('./routes');
 
 // const url_filter = require('./response_formatter');
 
+// 转发中间件
+app.use(async(ctx, next) => {
+    if (ctx.url.startsWith('/api')) { //匹配有api字段的请求url
+        ctx.respond = false // 绕过koa内置对象response ，写入原始res对象，而不是koa处理过的response
+        await k2c(httpProxy({
+                target: 'http://172.21.28.13:8081',
+                changeOrigin: true,
+                secure: false,
+                // pathRewrite: {
+                //     '^/api': ''
+                // }
+            }
+        ))(ctx,next);
+    }
+    await next()
+})
 
 // error handler
 onerror(app);
 
 // middlewares
-// app.use(bodyParser);
-// app.use(json());
+app.use(bodyParser);
+app.use(json());
 app.use(logger());
 
 app.use(require('koa-static')(__dirname + '/public'));

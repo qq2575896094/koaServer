@@ -102,7 +102,7 @@ module.exports = async (ctx, next) => {
         case 'text': {
 
             let content = oBody.Content;
-            let sRes = '您说的' + content + '太复杂了!';
+            let sRes = {type: 'text', content: '您说的' + content + '太复杂了!'};
 
             if (content === '1') {
                 sRes = {
@@ -119,52 +119,115 @@ module.exports = async (ctx, next) => {
                 }
             }
 
-            if (content === '2') {
+            if (content === '2') {//临时图片
                 let weChat = new WeChat(weChatConf).instance;
-                let mediaId = await weChat.uploadMaterial('image', path.join(__dirname, '../../../material/v8.png'));
+                let oMediaId = await weChat.uploadTemporaryMaterial('image', path.join(__dirname, '../../../material/v8.png'));
                 sRes = {
                     type: 'image',
-                    mediaId: mediaId
+                    mediaId: oMediaId.media_id
                 }
             }
 
-            if (content === '3') {
+            if (content === '3') {//临时video
                 let weChat = new WeChat(weChatConf).instance;
-                let mediaId = await weChat.uploadMaterial('image', path.join(__dirname, '../../../material/v8.png'), {type: 'image'});
-                sRes = {
-                    type: 'image',
-                    mediaId: mediaId
-                }
-            }
+                let oMediaId = await weChat.uploadTemporaryMaterial('video', path.join(__dirname, '../../../material/4.mp4'));
 
-            if (content === '4') {
-                let weChat = new WeChat(weChatConf).instance;
-                let mediaId = await weChat.uploadMaterial('video', path.join(__dirname, '../../../material/4.mp4'), {
-                    type: 'video',
-                    description: '{"title":"天下", "introduction":"天下武功唯快不破"}'
-                });
-                console.log(mediaId);
+                console.log('mediaId: ', oMediaId.media_id);
                 sRes = {
                     type: 'video',
-                    mediaId: mediaId,
+                    mediaId: oMediaId.media_id,
                     title: "天下",
                     description: "天下武功唯快不破"
                 }
             }
 
-            if (content === '11') {//音频
+            if (content === '4') {//临时voice
                 let weChat = new WeChat(weChatConf).instance;
-                let mediaId = await weChat.uploadMaterial('video', path.join(__dirname, '../../../material/5.mp4'), {
-                    type: 'video',
-                    description: '{"title":"天==下", "introduction":"天下武功唯快不破"}'
-                });
-                // console.log(mediaId);
+                let oMediaId = await weChat.uploadTemporaryMaterial('voice', path.join(__dirname, '../../../material/s.mp3'));
+
+                console.log('mediaId: ', oMediaId.media_id);
                 sRes = {
-                    type: 'video',
-                    mediaId: mediaId,
-                    title: "天下",
-                    description: "天下武功唯快不破"
+                    type: 'voice',
+                    mediaId: oMediaId.media_id,
                 }
+            }
+
+            if (content === '5') {//永久素材-image
+                let weChat = new WeChat(weChatConf).instance;
+                let oMediaId = await weChat.uploadPermanentMaterial('image', path.join(__dirname, '../../../material/v8.png'));
+
+                console.log('mediaId: ', oMediaId.media_id);
+                sRes = {
+                    type: 'image',
+                    mediaId: oMediaId.media_id,
+                }
+            }
+
+            if (content === '6') {//永久图文素材
+                let weChat = new WeChat(weChatConf).instance;
+                // let oImageId = await weChat.uploadPermanentMaterial('image', path.join(__dirname, '../../../material/4.mp4'));
+                let oMediaId = await weChat.uploadPermanentMaterial('news',
+                    [{
+                        title: '天涯',
+                        thumb_media_id: 'M_bq9t28HdsDw2UsRtupQqzSNw8bBuk5A0_QsCWnQWc',
+                        author: '雨田',
+                        digest: '海内存知己,天涯若比邻。',
+                        show_cover_pic: 1,
+                        content: '竹杖芒鞋轻胜马,谁怕?一蓑烟雨任平生。\r\n' +
+                        '醉后不知天在水,满船清梦压星河。\r\n' +
+                        '对一张琴,一壶酒,一溪云。\r\n' +
+                        '山中何事?松花酿酒,春水煮茶。\r\n' +
+                        '鹿门月照开烟树,忽到庞公栖隐处。\r\n' +
+                        '春水碧于天,画船听雨眠\r\n' +
+                        '掬水月在手,弄花香满衣。\r\n' +
+                        '采菊东篱下,悠然见南山。\r\n' +
+                        '我醉欲眠卿且去,明朝有意抱琴来。',
+                        content_source_url: 'https://github.com/qq2575896094'
+                    }]
+                );
+
+                console.log('mediaId: ', JSON.stringify(oMediaId));
+                sRes = [{
+                    title: oMediaId.title,
+                    description: oMediaId.digest,
+                    picUrl: oMediaId.thumb_media_id,
+                    url: oMediaId.content_source_url
+                }]
+
+
+            }
+            if (content === '7') {//永久图文素材
+                // let weChat = new WeChat(weChatConf).instance;
+                // let oImageId = await weChat.uploadPermanentMaterial('image', path.join(__dirname, '../../../material/4.mp4'));
+                // let oMediaId = await weChat.uploadPermanentMaterial('news',
+                //     [{
+                //         title: '天涯',
+                //         thumb_media_id: 'M_bq9t28HdsDw2UsRtupQqzSNw8bBuk5A0_QsCWnQWc',
+                //         author: '雨田',
+                //         digest: '海内存知己,天涯若比邻。',
+                //         show_cover_pic: 1,
+                //         content: '竹杖芒鞋轻胜马,谁怕?一蓑烟雨任平生。\r\n' +
+                //         '醉后不知天在水,满船清梦压星河。\r\n' +
+                //         '对一张琴,一壶酒,一溪云。\r\n' +
+                //         '山中何事?松花酿酒,春水煮茶。\r\n' +
+                //         '鹿门月照开烟树,忽到庞公栖隐处。\r\n' +
+                //         '春水碧于天,画船听雨眠\r\n' +
+                //         '掬水月在手,弄花香满衣。\r\n' +
+                //         '采菊东篱下,悠然见南山。\r\n' +
+                //         '我醉欲眠卿且去,明朝有意抱琴来。',
+                //         content_source_url: 'https://github.com/qq2575896094'
+                //     }]
+                // );
+
+                // console.log('mediaId: ', JSON.stringify(oMediaId));
+                sRes = [{
+                    title: '天涯',
+                    description: '海内存知己,天涯若比邻。',
+                    picUrl: 'M_bq9t28HdsDw2UsRtupQqzSNw8bBuk5A0_QsCWnQWc',
+                    url: 'https://github.com/qq2575896094'
+                }]
+
+
             }
 
             replyMessageXml = wxReply.tpl(sRes, oBody);

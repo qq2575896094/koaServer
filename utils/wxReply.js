@@ -6,6 +6,8 @@
 
 const tplUtils = require('./tplUtils');
 
+const _ = require('lodash');
+
 exports.tpl = (content, message) => {
     let replyInfo = {};
 
@@ -13,9 +15,11 @@ exports.tpl = (content, message) => {
 
     if (Array.isArray(content)) {
         type = 'news';
-    }
+    } else {
 
+    }
     replyInfo.content = content;
+
 
     type = content.type || type;
 
@@ -23,6 +27,8 @@ exports.tpl = (content, message) => {
     replyInfo.toUserName = message.FromUserName;
     replyInfo.fromUserName = message.ToUserName;
     replyInfo.createTime = new Date().getTime();
+
+    console.log('被动回复消息: ', replyInfo);
 
     return tplUtils.compiled(replyInfo);
 };
